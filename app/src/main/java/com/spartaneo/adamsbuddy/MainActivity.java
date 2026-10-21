@@ -58,6 +58,9 @@ public final class MainActivity extends Activity {
         addButton(layout, "Talk to Buddy", () -> openBuddy(BuddyLinks.HOME));
         addButton(layout, "Play game", () -> openBuddy(BuddyLinks.GAME));
         addButton(layout, "Earnings", () -> openBuddy(BuddyLinks.EARNINGS));
+        addButton(layout, "Health", () -> openBuddy(BuddyLinks.HEALTH));
+        addButton(layout, "AI tools", () -> openBuddy(BuddyLinks.AI_TOOLS));
+        addButton(layout, "Studio", () -> openBuddy(BuddyLinks.STUDIO));
         addButton(layout, "How to use", () -> openBuddy(BuddyLinks.HELP));
         reminderButton = addButton(layout, "", this::toggleReminders);
         updateReminderButton();
