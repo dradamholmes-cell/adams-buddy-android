@@ -8,12 +8,29 @@ android {
         applicationId 'com.spartaneo.adamsbuddy'
         minSdk 26
         targetSdk 35
-        versionCode 5
-        versionName '0.5.0'
+        versionCode 6
+        versionName '0.6.0'
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    if (System.getenv('BUDDY_KEYSTORE_PATH')) {
+        signingConfigs {
+            buddyRelease {
+                storeFile file(System.getenv('BUDDY_KEYSTORE_PATH'))
+                storePassword System.getenv('BUDDY_STORE_PASSWORD')
+                keyAlias 'buddy'
+                keyPassword System.getenv('BUDDY_STORE_PASSWORD')
+                storeType 'PKCS12'
+            }
+        }
+        buildTypes {
+            debug {
+                signingConfig signingConfigs.buddyRelease
+            }
+        }
     }
 }
