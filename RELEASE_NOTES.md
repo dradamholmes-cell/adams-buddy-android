@@ -1,5 +1,7 @@
-Adam's Buddy Android AM06C watch guidance update
+Adam's Buddy Android 0.10.0 — Buddy on AM06C
 
-Install the APK on an Android phone, then tap the Buddy icon. The header has Talk, Game, Daily, Watch, and More. Watch can send a phone alert that your existing watch app may mirror, save Buddy or arcade art to your phone, and open your installed AM06C watch app. It now clearly says the PNG-to-Custom import did not work and that animated watch faces are still being tested offline. More has Buddy Blaster, a small Doom-style original arcade game, and Buddy TV, which plays video selected from your phone. Use More for the optional 9 PM daily check-in notification too.
+The user confirmed that the Buddy sprite moves on the AM06C after transfer through SMART-TIME PRO. The Watch page now reports that result. Its save buttons still export still PNG art; they do not install the Dynamic face.
 
-This is a test APK. Private sign-in and watch mirroring need phone tests. Some sign-in providers refuse embedded login. Buddy Blaster runs on the phone and awards score only, not cash. Buddy TV plays phone video without uploading it. The AM06C can animate stored face frames, but an animated Buddy face, live video, and games on the watch are unverified. The app does not yet send live PC or task alerts, and it needs the internet for Buddy Site content. Uninstall versions before 0.6 once; 0.6 and later share a persistent signing key. No API keys or PC bridge credentials are packaged in the app.
+Buddy Blaster now has an optional "Watch play/pause → FIRE" button. With the game open, it exposes an Android media session and maps Play/Pause to FIRE. The session is inactive when the game is left. Companion logs show the watch sends music-control TOGGLE commands, but delivery to Buddy's session is not yet confirmed. The game runs on the phone. Live video, screen mirroring, and game graphics on the watch remain unverified.
+
+This is a test APK. Private sign-in and watch notification mirroring still need phone checks. Buddy TV plays a local phone video without uploading it. Buddy Blaster score is for fun, not cash. No API keys or PC bridge credentials are packaged in the app.

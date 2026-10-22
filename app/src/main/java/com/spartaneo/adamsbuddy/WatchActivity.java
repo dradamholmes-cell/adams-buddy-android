@@ -61,12 +61,12 @@ public final class WatchActivity extends Activity {
         preview.setImageBitmap(face);
         preview.setContentDescription("Preview of the Buddy watch face image");
         faceCard.addView(preview, new LinearLayout.LayoutParams(-1, dp(270)));
-        faceCard.addView(label("Buddy face  •  room for your watch's clock", 13,
+        faceCard.addView(label("Still art preview · your installed Dynamic Buddy face moves", 13,
                 Color.rgb(182, 208, 219), false));
         body.addView(faceCard);
         addSpace(body, 16);
 
-        body.addView(label("The watch app's Custom tab did not accept Buddy's PNG on this AM06C. Animated faces use a separate BIN format. A Buddy animation is being tested offline; it is not ready to send to the watch.",
+        body.addView(label("Buddy's animated Dynamic face is working on your AM06C. You confirmed Buddy moves. This picture is only still art; the watch animation is stored on the watch. Use the watch app to change faces.",
                 14, Color.rgb(182, 208, 219), false));
         addSpace(body, 12);
         action(body, "Open your watch app", false, this::openWatchApp);
@@ -85,10 +85,10 @@ public final class WatchActivity extends Activity {
         body.addView(label("In the watch app, open Device → Notification and allow Adam's Buddy. The test confirms only that the phone sent an alert; check the watch to confirm mirroring.",
                 14, Color.rgb(182, 208, 219), false));
         addSpace(body, 20);
-        body.addView(label("Official Dynamic faces show that the watch can animate stored frames. Live video, screen mirroring, and games still need a verified protocol. Buddy does not write unknown Bluetooth commands to the watch.",
+        body.addView(label("Watch Play/Pause can be tried as a FIRE button in Buddy Blaster while the game is open on your phone. The watch sends music commands to its companion app; this game control is experimental. Live video, screen mirroring, and a game drawn on the watch are not established.",
                 13, Color.rgb(174, 192, 203), false));
         addSpace(body, 14);
-        action(body, "Play Buddy Blaster on phone", false,
+        action(body, "Play Buddy Blaster · optional watch control", false,
                 () -> startActivity(new Intent(this, ArcadeActivity.class)));
         setContentView(scroll);
     }
@@ -191,7 +191,7 @@ public final class WatchActivity extends Activity {
         try (OutputStream stream = getContentResolver().openOutputStream(data.getData())) {
             if (stream == null || !selected.compress(Bitmap.CompressFormat.PNG, 100, stream))
                 throw new IOException("Could not save image");
-            Toast.makeText(this, "Image saved to your phone. Watch import is not yet verified.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Still PNG saved. Your animated Dynamic face is separate.", Toast.LENGTH_LONG).show();
         } catch (IOException error) {
             Toast.makeText(this, "Face could not be saved. Try again.", Toast.LENGTH_LONG).show();
         } finally {

@@ -8,10 +8,13 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,6 +22,9 @@ import android.widget.TextView;
 
 public final class ArcadeActivity extends Activity {
     private GameView game;
+    private MediaSession watchRemote;
+    private TextView watchRemoteStatus;
+    private boolean watchRemoteEnabled;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean running;
     private final Runnable tick = new Runnable() {
@@ -50,6 +56,12 @@ public final class ArcadeActivity extends Activity {
         note.setTextSize(13);
         root.addView(note);
 
+        watchRemoteStatus = new TextView(this);
+        watchRemoteStatus.setText("Watch remote off · game runs on phone");
+        watchRemoteStatus.setTextColor(Color.rgb(187, 211, 219));
+        watchRemoteStatus.setTextSize(12);
+        root.addView(watchRemoteStatus);
+
         game = new GameView();
         LinearLayout.LayoutParams gameSpace = new LinearLayout.LayoutParams(-1, 0, 1);
         gameSpace.topMargin = dp(12);
@@ -67,7 +79,49 @@ public final class ArcadeActivity extends Activity {
         controlAction(bottom, "New room", () -> game.reset());
         controlAction(bottom, "Play a video", () -> startActivity(new Intent(this, VideoActivity.class)));
         root.addView(bottom);
+        LinearLayout remoteRow = new LinearLayout(this);
+        controlAction(remoteRow, "Watch play/pause → FIRE", () -> {
+            watchRemoteEnabled = !watchRemoteEnabled;
+            updateWatchRemote();
+        });
+        root.addView(remoteRow);
         setContentView(root);
+    }
+
+    private void updateWatchRemote() {
+        if (!watchRemoteEnabled) {
+            if (watchRemote != null) watchRemote.setActive(false);
+            watchRemoteStatus.setText("Watch remote off · game runs on phone");
+            return;
+        }
+        if (watchRemote == null) {
+            watchRemote = new MediaSession(this, "Buddy Blaster watch remote");
+            watchRemote.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS
+                    | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            watchRemote.setCallback(new MediaSession.Callback() {
+                @Override public boolean onMediaButtonEvent(Intent intent) {
+                    KeyEvent key = intent == null ? null
+                            : intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                    if (key != null && key.getAction() == KeyEvent.ACTION_DOWN
+                            && (key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                            || key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY
+                            || key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PAUSE)) {
+                        runOnUiThread(() -> game.fire());
+                        return true;
+                    }
+                    return super.onMediaButtonEvent(intent);
+                }
+                @Override public void onPlay() { runOnUiThread(() -> game.fire()); }
+                @Override public void onPause() { runOnUiThread(() -> game.fire()); }
+            });
+            watchRemote.setPlaybackState(new PlaybackState.Builder()
+                    .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE
+                            | PlaybackState.ACTION_PLAY_PAUSE)
+                    .setState(PlaybackState.STATE_PLAYING, 0, 1f)
+                    .build());
+        }
+        if (running) watchRemote.setActive(true);
+        watchRemoteStatus.setText("Watch remote on · try Play/Pause in the watch Music screen");
     }
 
     private int dp(int value) {
@@ -123,13 +177,23 @@ public final class ArcadeActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         running = true;
+        if (watchRemoteEnabled) updateWatchRemote();
         handler.post(tick);
     }
 
     @Override protected void onPause() {
         running = false;
         handler.removeCallbacks(tick);
+        if (watchRemote != null) watchRemote.setActive(false);
         super.onPause();
+    }
+
+    @Override protected void onDestroy() {
+        if (watchRemote != null) {
+            watchRemote.release();
+            watchRemote = null;
+        }
+        super.onDestroy();
     }
 
     private final class GameView extends View {
