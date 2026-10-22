@@ -60,4 +60,47 @@ final class WatchFaceArt {
         }
         return bitmap;
     }
+
+    static Bitmap createArcade() {
+        Bitmap bitmap = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        canvas.drawColor(Color.rgb(7, 18, 28));
+        paint.setColor(Color.rgb(33, 61, 73));
+        canvas.drawCircle(256, 256, 246, paint);
+        paint.setColor(Color.rgb(118, 205, 182));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(7);
+        canvas.drawCircle(256, 256, 239, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        int[] shades = {
+                Color.rgb(33, 80, 94), Color.rgb(44, 108, 118),
+                Color.rgb(61, 135, 139), Color.rgb(88, 159, 151)
+        };
+        for (int i = 0; i < shades.length; i++) {
+            int inset = 85 + i * 34;
+            paint.setColor(shades[i]);
+            canvas.drawRect(inset, 167 + i * 25, 512 - inset, 420 - i * 23, paint);
+            paint.setColor(Color.rgb(8, 24, 35));
+            canvas.drawRect(inset + 10, 177 + i * 25, 502 - inset,
+                    410 - i * 23, paint);
+        }
+
+        paint.setColor(Color.rgb(238, 100, 91));
+        canvas.drawCircle(256, 348, 35, paint);
+        paint.setColor(Color.rgb(17, 25, 32));
+        canvas.drawCircle(243, 343, 5, paint);
+        canvas.drawCircle(269, 343, 5, paint);
+        paint.setColor(Color.rgb(245, 197, 116));
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(28);
+        canvas.drawText("BUDDY BLASTER", 256, 115, paint);
+        paint.setTextSize(17);
+        paint.setColor(Color.rgb(154, 223, 207));
+        canvas.drawText("ARCADE WATCH FACE", 256, 143, paint);
+        // The companion app places the actual clock over this static background.
+        return bitmap;
+    }
 }

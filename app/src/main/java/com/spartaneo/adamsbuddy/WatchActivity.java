@@ -28,9 +28,11 @@ public final class WatchActivity extends Activity {
     private final int card = Color.rgb(18, 47, 62);
     private final int mint = Color.rgb(134, 224, 194);
     private Bitmap face;
+    private boolean saveArcade;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        if (state != null) saveArcade = state.getBoolean("save_arcade", false);
         getWindow().setStatusBarColor(ink);
         getWindow().setNavigationBarColor(ink);
         face = WatchFaceArt.create(this);
@@ -64,9 +66,12 @@ public final class WatchActivity extends Activity {
         body.addView(faceCard);
         addSpace(body, 16);
 
-        action(body, "Save Buddy watch face", true, this::saveFace);
+        action(body, "Save Buddy watch face", true, () -> saveFace(false));
+        action(body, "Save arcade watch face", false, () -> saveFace(true));
         body.addView(label("Then open your watch app: Device → Watch Face Gallery → Custom. Pick the saved image there.",
                 14, Color.rgb(182, 208, 219), false));
+        addSpace(body, 12);
+        action(body, "Open your watch app", false, this::openWatchApp);
         addSpace(body, 24);
 
         LinearLayout alertCard = card();
@@ -137,12 +142,22 @@ public final class WatchActivity extends Activity {
         parent.addView(new TextView(this), new LinearLayout.LayoutParams(1, dp(height)));
     }
 
-    private void saveFace() {
+    private void saveFace(boolean arcade) {
+        saveArcade = arcade;
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/png");
-        intent.putExtra(Intent.EXTRA_TITLE, "Buddy-AM06C-face.png");
+        intent.putExtra(Intent.EXTRA_TITLE, arcade ? "Buddy-Arcade-AM06C.png" : "Buddy-AM06C-face.png");
         startActivityForResult(intent, SAVE_FACE);
+    }
+
+    private void openWatchApp() {
+        Intent launch = getPackageManager().getLaunchIntentForPackage("com.sma.smartv3.pro");
+        if (launch == null) {
+            Toast.makeText(this, "Watch app not found. Open it from your phone's app list.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        startActivity(launch);
     }
 
     private void sendTest() {
@@ -172,13 +187,21 @@ public final class WatchActivity extends Activity {
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != SAVE_FACE || resultCode != RESULT_OK || data == null || data.getData() == null) return;
+        Bitmap selected = saveArcade ? WatchFaceArt.createArcade() : face;
         try (OutputStream stream = getContentResolver().openOutputStream(data.getData())) {
-            if (stream == null || !face.compress(Bitmap.CompressFormat.PNG, 100, stream))
+            if (stream == null || !selected.compress(Bitmap.CompressFormat.PNG, 100, stream))
                 throw new IOException("Could not save image");
             Toast.makeText(this, "Face saved. Choose it in your watch app's Custom tab.", Toast.LENGTH_LONG).show();
         } catch (IOException error) {
             Toast.makeText(this, "Face could not be saved. Try again.", Toast.LENGTH_LONG).show();
+        } finally {
+            if (saveArcade) selected.recycle();
         }
+    }
+
+    @Override protected void onSaveInstanceState(Bundle state) {
+        state.putBoolean("save_arcade", saveArcade);
+        super.onSaveInstanceState(state);
     }
 
     @Override protected void onDestroy() {
