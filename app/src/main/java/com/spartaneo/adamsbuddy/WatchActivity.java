@@ -66,12 +66,12 @@ public final class WatchActivity extends Activity {
         body.addView(faceCard);
         addSpace(body, 16);
 
-        action(body, "Save Buddy watch face", true, () -> saveFace(false));
-        action(body, "Save arcade watch face", false, () -> saveFace(true));
-        body.addView(label("Then open your watch app: Device → Watch Face Gallery → Custom. Pick the saved image there.",
+        body.addView(label("The watch app's Custom tab did not accept Buddy's PNG on this AM06C. Animated faces use a separate BIN format. A Buddy animation is being tested offline; it is not ready to send to the watch.",
                 14, Color.rgb(182, 208, 219), false));
         addSpace(body, 12);
         action(body, "Open your watch app", false, this::openWatchApp);
+        action(body, "Save Buddy art to phone", false, () -> saveFace(false));
+        action(body, "Save arcade art to phone", false, () -> saveFace(true));
         addSpace(body, 24);
 
         LinearLayout alertCard = card();
@@ -85,7 +85,7 @@ public final class WatchActivity extends Activity {
         body.addView(label("In the watch app, open Device → Notification and allow Adam's Buddy. The test confirms only that the phone sent an alert; check the watch to confirm mirroring.",
                 14, Color.rgb(182, 208, 219), false));
         addSpace(body, 20);
-        body.addView(label("Live screen or video mirroring is not available from the watch controls shown. Buddy does not write unknown Bluetooth commands to the watch.",
+        body.addView(label("Official Dynamic faces show that the watch can animate stored frames. Live video, screen mirroring, and games still need a verified protocol. Buddy does not write unknown Bluetooth commands to the watch.",
                 13, Color.rgb(174, 192, 203), false));
         addSpace(body, 14);
         action(body, "Play Buddy Blaster on phone", false,
@@ -191,7 +191,7 @@ public final class WatchActivity extends Activity {
         try (OutputStream stream = getContentResolver().openOutputStream(data.getData())) {
             if (stream == null || !selected.compress(Bitmap.CompressFormat.PNG, 100, stream))
                 throw new IOException("Could not save image");
-            Toast.makeText(this, "Face saved. Choose it in your watch app's Custom tab.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Image saved to your phone. Watch import is not yet verified.", Toast.LENGTH_LONG).show();
         } catch (IOException error) {
             Toast.makeText(this, "Face could not be saved. Try again.", Toast.LENGTH_LONG).show();
         } finally {
