@@ -82,6 +82,9 @@ public final class WatchActivity extends Activity {
         addSpace(body, 20);
         body.addView(label("Live screen or video mirroring is not available from the watch controls shown. Buddy does not write unknown Bluetooth commands to the watch.",
                 13, Color.rgb(174, 192, 203), false));
+        addSpace(body, 14);
+        action(body, "Play Buddy Blaster on phone", false,
+                () -> startActivity(new Intent(this, ArcadeActivity.class)));
         setContentView(scroll);
     }
 

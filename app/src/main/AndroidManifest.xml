@@ -16,6 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".WatchActivity" android:exported="false" />
+        <activity android:name=".ArcadeActivity" android:exported="false" />
+        <activity android:name=".VideoActivity" android:exported="false" />
         <receiver android:name=".ReminderReceiver" android:exported="false" />
         <receiver android:name=".BootReceiver" android:exported="false">
             <intent-filter>

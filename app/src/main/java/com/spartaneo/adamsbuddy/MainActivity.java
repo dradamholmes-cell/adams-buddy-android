@@ -124,9 +124,12 @@ public final class MainActivity extends Activity {
     private void showOptions() {
         String reminder = ReminderReceiver.enabled(this) ? "Turn off daily reminder" : "Turn on daily reminder";
         new AlertDialog.Builder(this).setTitle("Buddy settings")
-                .setItems(new String[]{reminder, "Test notification", "Reload page"}, (dialog, which) -> {
-                    if (which == 0) toggleReminders();
-                    else if (which == 1) {
+                .setItems(new String[]{"Buddy Blaster arcade", "Play a video", reminder,
+                        "Test notification", "Reload page"}, (dialog, which) -> {
+                    if (which == 0) startActivity(new Intent(this, ArcadeActivity.class));
+                    else if (which == 1) startActivity(new Intent(this, VideoActivity.class));
+                    else if (which == 2) toggleReminders();
+                    else if (which == 3) {
                         if (requestNotificationPermission()) pendingTestNotification = true;
                         else ReminderReceiver.notifyNow(this);
                     } else webView.reload();
