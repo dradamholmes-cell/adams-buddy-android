@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final int NOTIFICATION_REQUEST = 40;
-    private static final String BUDDY_HOST = "adams-buddy-control.l3onidas.chatgpt.site";
     private WebView webView;
     private boolean pendingReminderEnable;
     private boolean pendingTestNotification;
@@ -55,11 +54,9 @@ public final class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme();
-                if ("https".equalsIgnoreCase(scheme)) {
-                    if (BUDDY_HOST.equalsIgnoreCase(uri.getHost()) || isSignInHost(uri.getHost())) return false;
-                    openExternal(uri);
-                    return true;
-                }
+                // The private site's login crosses several HTTPS origins. Opening even one
+                // redirect in Chrome loses WebView's sign-in cookies and invalidates the flow.
+                if ("https".equalsIgnoreCase(scheme)) return false;
                 if ("http".equalsIgnoreCase(scheme)) return true;
                 openExternal(uri);
                 return true;
@@ -72,14 +69,6 @@ public final class MainActivity extends Activity {
             String path = getIntent().getStringExtra("buddy_path");
             openBuddy("/game".equals(path) ? BuddyLinks.GAME : BuddyLinks.HOME);
         }
-    }
-
-    private static boolean isSignInHost(String host) {
-        if (host == null) return false;
-        String h = host.toLowerCase(java.util.Locale.ROOT);
-        return h.equals("chatgpt.com") || h.endsWith(".chatgpt.com")
-                || h.equals("openai.com") || h.endsWith(".openai.com")
-                || h.equals("auth0.com") || h.endsWith(".auth0.com");
     }
 
     private int dp(int value) {
