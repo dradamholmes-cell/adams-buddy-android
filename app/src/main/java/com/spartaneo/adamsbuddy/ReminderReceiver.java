@@ -47,25 +47,36 @@ public final class ReminderReceiver extends BroadcastReceiver {
     }
 
     static void notifyNow(Context context) {
+        post(context, CHANNEL, "Buddy check-in", "Check in with Buddy",
+                "Open your tasks and daily PC report.", 31);
+    }
+
+    static void notifyWatchTest(Context context) {
+        post(context, "buddy_watch_test", "Buddy watch pings", "Buddy says hello 👋",
+                "If enabled in your watch app, this alert should appear on your AM06C.", 33);
+    }
+
+    private static void post(Context context, String channel, String channelName,
+                             String title, String message, int id) {
         if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
         NotificationManager notifications = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notifications == null) return;
-        notifications.createNotificationChannel(new NotificationChannel(CHANNEL, "Buddy check-in",
+        notifications.createNotificationChannel(new NotificationChannel(channel, channelName,
                 NotificationManager.IMPORTANCE_DEFAULT));
         Intent open = new Intent(context, MainActivity.class);
         open.setAction(Intent.ACTION_VIEW);
         open.putExtra("buddy_path", "/");
         PendingIntent tap = PendingIntent.getActivity(context, 32, open,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Notification notification = new Notification.Builder(context, CHANNEL)
+        Notification notification = new Notification.Builder(context, channel)
                 .setSmallIcon(R.drawable.buddy_notification)
-                .setContentTitle("Check in with Buddy")
-                .setContentText("Open your tasks and daily PC report.")
+                .setContentTitle(title)
+                .setContentText(message)
                 .setContentIntent(tap)
                 .setAutoCancel(true)
                 .build();
-        notifications.notify(31, notification);
+        notifications.notify(id, notification);
     }
 
     @Override public void onReceive(Context context, Intent intent) {

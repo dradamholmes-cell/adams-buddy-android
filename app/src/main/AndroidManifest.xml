@@ -7,7 +7,7 @@
         android:allowBackup="false"
         android:label="Adam's Buddy"
         android:icon="@drawable/buddy_icon"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
@@ -15,6 +15,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".WatchActivity" android:exported="false" />
         <receiver android:name=".ReminderReceiver" android:exported="false" />
         <receiver android:name=".BootReceiver" android:exported="false">
             <intent-filter>

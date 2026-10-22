@@ -7,6 +7,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,7 +18,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public final class MainActivity extends Activity {
@@ -29,16 +32,42 @@ public final class MainActivity extends Activity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setTitle("Adam's Buddy");
+        getWindow().setStatusBarColor(Color.rgb(8, 22, 34));
+        getWindow().setNavigationBarColor(Color.rgb(8, 22, 34));
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.rgb(7, 19, 30));
 
+        LinearLayout header = new LinearLayout(this);
+        header.setPadding(dp(16), dp(10), dp(16), dp(7));
+        header.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.drawable.buddy_icon);
+        header.addView(logo, new LinearLayout.LayoutParams(dp(43), dp(43)));
+        LinearLayout titles = new LinearLayout(this);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(dp(10), 0, 0, 0);
+        TextView title = new TextView(this);
+        title.setText("ADAM'S BUDDY");
+        title.setTextSize(18);
+        title.setTypeface(null, 1);
+        title.setTextColor(Color.WHITE);
+        titles.addView(title);
+        TextView subtitle = new TextView(this);
+        subtitle.setText("Talk. Play. Get things done.");
+        subtitle.setTextSize(12);
+        subtitle.setTextColor(Color.rgb(170, 210, 220));
+        titles.addView(subtitle);
+        header.addView(titles);
+        root.addView(header);
+
         LinearLayout bar = new LinearLayout(this);
-        bar.setPadding(dp(4), dp(2), dp(4), dp(2));
-        addButton(bar, "Buddy", () -> openBuddy(BuddyLinks.HOME));
+        bar.setPadding(dp(7), dp(2), dp(7), dp(8));
+        addButton(bar, "Talk", () -> openBuddy(BuddyLinks.HOME));
         addButton(bar, "Game", () -> openBuddy(BuddyLinks.GAME));
         addButton(bar, "Daily", () -> openBuddy(BuddyLinks.BASE + "/daily"));
-        addButton(bar, "⋮", this::showOptions);
+        addButton(bar, "Watch", () -> startActivity(new Intent(this, WatchActivity.class)));
+        addButton(bar, "More", this::showOptions);
         root.addView(bar);
 
         webView = new WebView(this);
@@ -80,8 +109,16 @@ public final class MainActivity extends Activity {
         button.setText(label);
         button.setAllCaps(false);
         button.setTextSize(12);
+        button.setTextColor(Color.rgb(228, 247, 248));
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(Color.rgb(19, 56, 72));
+        background.setCornerRadius(dp(12));
+        background.setStroke(dp(1), Color.rgb(76, 141, 154));
+        button.setBackground(background);
         button.setOnClickListener(view -> action.run());
-        row.addView(button, new LinearLayout.LayoutParams(0, dp(48), 1));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(43), 1);
+        params.setMargins(dp(2), 0, dp(2), 0);
+        row.addView(button, params);
     }
 
     private void showOptions() {
