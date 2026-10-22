@@ -85,7 +85,7 @@ public final class WatchActivity extends Activity {
         body.addView(label("In the watch app, open Device → Notification and allow Adam's Buddy. The test confirms only that the phone sent an alert; check the watch to confirm mirroring.",
                 14, Color.rgb(182, 208, 219), false));
         addSpace(body, 20);
-        body.addView(label("Watch Play/Pause can be tried as a FIRE button in Buddy Blaster while the game is open on your phone. The watch sends music commands to its companion app; this game control is experimental. Live video, screen mirroring, and a game drawn on the watch are not established.",
+        body.addView(label("The watch Music screen is a remote for the phone; it does not play music itself. Its Play/Pause command reached the watch companion and Buddy was listed as the active controller. Buddy Blaster now shows how many FIRE commands it receives. Live video, screen mirroring, and a game drawn on the watch are not established.",
                 13, Color.rgb(174, 192, 203), false));
         addSpace(body, 14);
         action(body, "Play Buddy Blaster · optional watch control", false,

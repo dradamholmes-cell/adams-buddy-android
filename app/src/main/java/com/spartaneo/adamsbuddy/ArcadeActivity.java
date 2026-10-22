@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.media.MediaMetadata;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +26,8 @@ public final class ArcadeActivity extends Activity {
     private MediaSession watchRemote;
     private TextView watchRemoteStatus;
     private boolean watchRemoteEnabled;
+    private boolean watchRemotePlaying = true;
+    private int watchPressCount;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean running;
     private final Runnable tick = new Runnable() {
@@ -57,7 +60,7 @@ public final class ArcadeActivity extends Activity {
         root.addView(note);
 
         watchRemoteStatus = new TextView(this);
-        watchRemoteStatus.setText("Watch remote off · game runs on phone");
+        watchRemoteStatus.setText("Watch remote off · Music screen is a remote, not a music player");
         watchRemoteStatus.setTextColor(Color.rgb(187, 211, 219));
         watchRemoteStatus.setTextSize(12);
         root.addView(watchRemoteStatus);
@@ -91,7 +94,7 @@ public final class ArcadeActivity extends Activity {
     private void updateWatchRemote() {
         if (!watchRemoteEnabled) {
             if (watchRemote != null) watchRemote.setActive(false);
-            watchRemoteStatus.setText("Watch remote off · game runs on phone");
+            watchRemoteStatus.setText("Watch remote off · Music screen is a remote, not a music player");
             return;
         }
         if (watchRemote == null) {
@@ -106,22 +109,43 @@ public final class ArcadeActivity extends Activity {
                             && (key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
                             || key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY
                             || key.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PAUSE)) {
-                        runOnUiThread(() -> game.fire());
+                        fireFromWatch(!watchRemotePlaying);
                         return true;
                     }
                     return super.onMediaButtonEvent(intent);
                 }
-                @Override public void onPlay() { runOnUiThread(() -> game.fire()); }
-                @Override public void onPause() { runOnUiThread(() -> game.fire()); }
+                @Override public void onPlay() { fireFromWatch(true); }
+                @Override public void onPause() { fireFromWatch(false); }
             });
-            watchRemote.setPlaybackState(new PlaybackState.Builder()
-                    .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE
-                            | PlaybackState.ACTION_PLAY_PAUSE)
-                    .setState(PlaybackState.STATE_PLAYING, 0, 1f)
+            watchRemote.setMetadata(new MediaMetadata.Builder()
+                    .putString(MediaMetadata.METADATA_KEY_TITLE, "Buddy Blaster")
+                    .putString(MediaMetadata.METADATA_KEY_ARTIST, "Watch button fires")
                     .build());
+            setWatchPlaybackState();
         }
         if (running) watchRemote.setActive(true);
-        watchRemoteStatus.setText("Watch remote on · try Play/Pause in the watch Music screen");
+        watchRemoteStatus.setText("Watch remote on · presses received: " + watchPressCount);
+    }
+
+    private void setWatchPlaybackState() {
+        if (watchRemote == null) return;
+        watchRemote.setPlaybackState(new PlaybackState.Builder()
+                .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE
+                        | PlaybackState.ACTION_PLAY_PAUSE)
+                .setState(watchRemotePlaying ? PlaybackState.STATE_PLAYING
+                        : PlaybackState.STATE_PAUSED, 0, watchRemotePlaying ? 1f : 0f)
+                .build());
+    }
+
+    private void fireFromWatch(boolean playing) {
+        runOnUiThread(() -> {
+            if (!running || !watchRemoteEnabled) return;
+            watchRemotePlaying = playing;
+            setWatchPlaybackState();
+            watchPressCount++;
+            game.fire();
+            watchRemoteStatus.setText("Watch FIRE received: " + watchPressCount);
+        });
     }
 
     private int dp(int value) {
