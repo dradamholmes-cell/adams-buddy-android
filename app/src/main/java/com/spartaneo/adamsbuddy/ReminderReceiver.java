@@ -47,8 +47,8 @@ public final class ReminderReceiver extends BroadcastReceiver {
     }
 
     static void notifyNow(Context context) {
-        post(context, CHANNEL, "Buddy check-in", "Check in with Buddy",
-                "Open your tasks and daily PC report.", 31);
+        post(context, CHANNEL, "Buddy check-in", "Your daily Buddy check-in",
+                "Check your pill list, save a joke idea, and pick today's next move.", 31);
     }
 
     static void notifyWatchTest(Context context) {
@@ -66,7 +66,7 @@ public final class ReminderReceiver extends BroadcastReceiver {
                 NotificationManager.IMPORTANCE_DEFAULT));
         Intent open = new Intent(context, MainActivity.class);
         open.setAction(Intent.ACTION_VIEW);
-        open.putExtra("buddy_path", "/");
+        open.putExtra("buddy_path", "/today");
         PendingIntent tap = PendingIntent.getActivity(context, 32, open,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new Notification.Builder(context, channel)

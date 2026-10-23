@@ -54,7 +54,7 @@ public final class MainActivity extends Activity {
         title.setTextColor(Color.WHITE);
         titles.addView(title);
         TextView subtitle = new TextView(this);
-        subtitle.setText("Talk. Play. Get things done.");
+        subtitle.setText("Your day, your Buddy, your game.");
         subtitle.setTextSize(12);
         subtitle.setTextColor(Color.rgb(170, 210, 220));
         titles.addView(subtitle);
@@ -63,10 +63,10 @@ public final class MainActivity extends Activity {
 
         LinearLayout bar = new LinearLayout(this);
         bar.setPadding(dp(7), dp(2), dp(7), dp(8));
+        addButton(bar, "Today", () -> openBuddy(BuddyLinks.TODAY));
         addButton(bar, "Talk", () -> openBuddy(BuddyLinks.HOME));
         addButton(bar, "Game", () -> openBuddy(BuddyLinks.GAME));
-        addButton(bar, "Daily", () -> openBuddy(BuddyLinks.BASE + "/daily"));
-        addButton(bar, "Watch", () -> startActivity(new Intent(this, WatchActivity.class)));
+        addButton(bar, "Earn", () -> openBuddy(BuddyLinks.EARNINGS));
         addButton(bar, "More", this::showOptions);
         root.addView(bar);
 
@@ -96,7 +96,7 @@ public final class MainActivity extends Activity {
 
         if (state == null || webView.restoreState(state) == null) {
             String path = getIntent().getStringExtra("buddy_path");
-            openBuddy("/game".equals(path) ? BuddyLinks.GAME : BuddyLinks.HOME);
+            openBuddy("/game".equals(path) ? BuddyLinks.GAME : "/".equals(path) ? BuddyLinks.HOME : BuddyLinks.TODAY);
         }
     }
 
@@ -124,12 +124,15 @@ public final class MainActivity extends Activity {
     private void showOptions() {
         String reminder = ReminderReceiver.enabled(this) ? "Turn off daily reminder" : "Turn on daily reminder";
         new AlertDialog.Builder(this).setTitle("Buddy settings")
-                .setItems(new String[]{"Buddy Blaster arcade", "Play a video", reminder,
-                        "Test notification", "Reload page"}, (dialog, which) -> {
-                    if (which == 0) startActivity(new Intent(this, ArcadeActivity.class));
-                    else if (which == 1) startActivity(new Intent(this, VideoActivity.class));
-                    else if (which == 2) toggleReminders();
-                    else if (which == 3) {
+                .setItems(new String[]{"Daily checklist", "Connections", "Watch", "Buddy Blaster arcade",
+                        "Play a video", reminder, "Test notification", "Reload page"}, (dialog, which) -> {
+                    if (which == 0) openBuddy(BuddyLinks.BASE + "/daily");
+                    else if (which == 1) openBuddy(BuddyLinks.AI_TOOLS);
+                    else if (which == 2) startActivity(new Intent(this, WatchActivity.class));
+                    else if (which == 3) startActivity(new Intent(this, ArcadeActivity.class));
+                    else if (which == 4) startActivity(new Intent(this, VideoActivity.class));
+                    else if (which == 5) toggleReminders();
+                    else if (which == 6) {
                         if (requestNotificationPermission()) pendingTestNotification = true;
                         else ReminderReceiver.notifyNow(this);
                     } else webView.reload();
