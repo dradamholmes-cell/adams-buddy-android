@@ -26,11 +26,13 @@ import android.widget.Toast;
 public final class MainActivity extends Activity {
     private static final int NOTIFICATION_REQUEST = 40;
     private WebView webView;
+    private BuddySpeech speech;
     private boolean pendingReminderEnable;
     private boolean pendingTestNotification;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        speech = new BuddySpeech(this);
         setTitle("Adam's Buddy");
         getWindow().setStatusBarColor(Color.rgb(8, 22, 34));
         getWindow().setNavigationBarColor(Color.rgb(8, 22, 34));
@@ -76,6 +78,7 @@ public final class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSupportMultipleWindows(false);
+        settings.setUserAgentString(settings.getUserAgentString() + " AdamBuddyAndroid/0.13");
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
         webView.setWebChromeClient(new WebChromeClient());
@@ -83,6 +86,15 @@ public final class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme();
+                if ("buddy-voice".equalsIgnoreCase(scheme)) {
+                    Uri current = Uri.parse(view.getUrl() == null ? "" : view.getUrl());
+                    if (request.isForMainFrame() && "speak".equalsIgnoreCase(uri.getHost())
+                            && "https".equalsIgnoreCase(current.getScheme())
+                            && "adams-buddy-control.l3onidas.chatgpt.site".equalsIgnoreCase(current.getHost())) {
+                        speech.speak(uri.getQueryParameter("text"));
+                    }
+                    return true;
+                }
                 // The private site's login crosses several HTTPS origins. Opening even one
                 // redirect in Chrome loses WebView's sign-in cookies and invalidates the flow.
                 if ("https".equalsIgnoreCase(scheme)) return false;
@@ -124,15 +136,16 @@ public final class MainActivity extends Activity {
     private void showOptions() {
         String reminder = ReminderReceiver.enabled(this) ? "Turn off daily reminder" : "Turn on daily reminder";
         new AlertDialog.Builder(this).setTitle("Buddy settings")
-                .setItems(new String[]{"Daily checklist", "Connections", "Watch", "Buddy Blaster arcade",
+                .setItems(new String[]{"Daily checklist", "Connections", "Buddy voice", "Watch", "Buddy Blaster arcade",
                         "Play a video", reminder, "Test notification", "Reload page"}, (dialog, which) -> {
                     if (which == 0) openBuddy(BuddyLinks.BASE + "/daily");
-                    else if (which == 1) openBuddy(BuddyLinks.AI_TOOLS);
-                    else if (which == 2) startActivity(new Intent(this, WatchActivity.class));
-                    else if (which == 3) startActivity(new Intent(this, ArcadeActivity.class));
-                    else if (which == 4) startActivity(new Intent(this, VideoActivity.class));
-                    else if (which == 5) toggleReminders();
-                    else if (which == 6) {
+                    else if (which == 1) openBuddy(BuddyLinks.BASE + "/connections");
+                    else if (which == 2) speech.showPicker();
+                    else if (which == 3) startActivity(new Intent(this, WatchActivity.class));
+                    else if (which == 4) startActivity(new Intent(this, ArcadeActivity.class));
+                    else if (which == 5) startActivity(new Intent(this, VideoActivity.class));
+                    else if (which == 6) toggleReminders();
+                    else if (which == 7) {
                         if (requestNotificationPermission()) pendingTestNotification = true;
                         else ReminderReceiver.notifyNow(this);
                     } else webView.reload();
@@ -161,6 +174,7 @@ public final class MainActivity extends Activity {
     }
 
     @Override protected void onDestroy() {
+        if (speech != null) speech.shutdown();
         if (webView != null) webView.destroy();
         super.onDestroy();
     }

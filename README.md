@@ -1,6 +1,8 @@
 # Adam's Buddy for Android
 
-This is an installable Android app for the private Buddy control center. Version 0.12 opens on Today, with one-tap Talk, Game, and Earn buttons. Today combines the pill check, joke idea, next earning action, and three saved PC tasks. HTTPS links stay in an in-app WebView so the private sign-in redirect chain uses one cookie store. It provides native daily check-in notifications and one-tap launch from the phone's app list.
+This is an installable Android app for the private Buddy control center. Version 0.13 opens on Today, with one-tap Talk, Game, and Earn buttons. Today combines the pill check, joke idea, next earning action, and three saved PC tasks. HTTPS links stay in an in-app WebView so the private sign-in redirect chain uses one cookie store. It provides native daily check-in notifications and one-tap launch from the phone's app list.
+
+On Today, Buddy can read replies aloud with Android text to speech. Tap **More → Buddy voice** to preview the free English voices installed on your phone. The Today page can speak every answer automatically or only when you tap Read reply aloud. This uses the phone voice engine and needs no paid AI voice service.
 
 The native Watch screen is designed for the user's AM06C. It sends a generic phone test notification for the existing watch companion app to mirror, opens Buddy's Android notification settings, saves 512×512 still PNG art to the phone, and opens the installed `com.sma.smartv3.pro` watch app. The PNG-to-Custom route is not the animation route. A separate Dynamic-face BIN created from the user's Buddy sprite has been transferred using the companion app's cache, and the user confirmed Buddy moves on the watch. The app itself does not upload faces or write to the watch over Bluetooth. Notification delivery still requires a phone test.
 
